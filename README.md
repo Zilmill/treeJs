@@ -1,2 +1,2 @@
-# treeJs
-纯Javascript 写的树
+# 结构树
+
