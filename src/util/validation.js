@@ -20,3 +20,4 @@ export const isFalse = (val) => {
   if (!ObjectIs(val, 'boolean')) { return false }
   return !val || false
 }
+

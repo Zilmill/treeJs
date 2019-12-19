@@ -49,7 +49,9 @@ export default class TreeRender {
    * @param key
    * @returns {*}
    */
-  getKey (key, pid) { return key ? md5(pid ? `${key}${pid}` : key) : '' }
+  getKey (key, pid) {
+    return key ? md5(pid ? `${key}${pid}` : key.toString()) : ''
+  }
 
   /**
    * 先把提供的数据转化为平级的，再进行数据处理
@@ -79,19 +81,28 @@ export default class TreeRender {
       level_title = []
     }
     // 生成指定数据
-    level.forEach((key, index) => {
-      _data.forEach(_item => {
-        // 此id可能重复，需要更改
-        const pid = this.getKey(_item[level[index - 1]], _item[level[index - 2]])
-        const id = this.getKey(_item[key], _item[level[index - 1]])
-        this._data[id] = Object.assign({}, _item, {
-          _tree_node_id: id,
-          _tree_node_pid: pid,
-          _tree_node_title: _item[level_title[index]],
-          _tree_node_level: index + 1
-        })
+    _data.forEach(_item => {
+      level.forEach((key, index) => {
+        const val = _item[key]
+        if (ObjectIs(val, 'string') || ObjectIs(val, 'number')) {
+          const prevKey = level[index - 1]
+          const preVal = _item[prevKey]
+          const pid = this.getKey(preVal, _item[level[index - 2]])
+          const id = this.getKey(val, preVal)
+          const title_key = level_title[index]
+
+          this._data[id] = Object.assign({}, _item, {
+            _tree_node_id: id,
+            _tree_node_pid: pid,
+            _tree_node_title: _item[title_key] || title_key,
+            _tree_node_level: index + 1
+          })
+        } else {
+          console.warn('此参数不是字符串，无法以此参数为一层', key, val)
+        }
       })
     })
+
     return this._data
   }
 
