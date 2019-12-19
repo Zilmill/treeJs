@@ -60,7 +60,7 @@ const getOption = (format, info = {}) => {
     const entryPath = info.entryPath || '~/index.js'
     const dest = info.dest
     const env = info.env || 'development'
-    const _dest = dest || `${outputDir}/index.${format}${/dev/.test(env) ? '' : '.min'}.js`
+    const _dest = dest || `${outputDir}/${_name}.${format}${/dev/.test(env) ? '' : '.min'}.js`
     return {
         entry: resolve(entryPath),
         dest: resolve(_dest),
@@ -137,7 +137,7 @@ fse.ensureDirSync(outputDir)
 if (process.env.TARGET) {
     const option = builds[process.env.TARGET]
     if (!option) { throw new Error('无此配置') }
-    option.dest = resolve(`${outputDir}/index.js`)
+    option.dest = resolve(`${outputDir}/${_name}.js`)
 
     const config = getConfig(option, process.env.TARGET)
     config.plugins = config.plugins.concat([
