@@ -49,6 +49,14 @@ export function isChecked (nodeIdOrEl) {
 }
 
 /**
+ * 每次更新的时候先清空
+ */
+export function clearView (parent) {
+  const ul = elementFind(parent, 'tree_ul')
+  removeElement(ul)
+}
+
+/**
  * 创建父级
  * @param id
  * @param title
@@ -132,8 +140,7 @@ export function onHandleExpend (item) {
   } else {
     header.classList.remove('open')
     const parent = document.getElementById(item._tree_node_id)
-    const ul = elementFind(parent, 'tree_ul')
-    removeElement(ul)
+    clearView(parent)
   }
 }
 

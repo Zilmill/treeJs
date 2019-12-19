@@ -13,7 +13,7 @@
 	<script>
 		console.log('Treejs', Treejs)
 
-		const all = {
+		var all = {
 			'db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@0f71c4b2acb96e46efa6c889ce2260ae': {
 				CategoryId: "0f71c4b2acb96e46efa6c889ce2260ae",
 				CategoryName: "挂衣钩",
@@ -60,9 +60,10 @@
 
 		var tree = new Treejs.install('#tree', {
 			data: all,
-			tree: space_option
+			tree: major_option
 		})
 		console.log('tree', tree)
+		// tree.tree.updateTree(all, major_option)
 	</script>
 </body>
 </html>

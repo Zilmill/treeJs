@@ -47,10 +47,13 @@ export function elementFind (el, classOrTagName) {
  * @param els
  */
 export function removeElement (els) {
+  if (!els) { return }
   if (!Array.isArray(els)) { els = [els] }
   for (let i = 0; i < els.length; i++) {
     const item = els[i]
-    item.parentNode.removeChild(item)
+    if (item) {
+      item.parentNode.removeChild(item)
+    }
   }
 }
 

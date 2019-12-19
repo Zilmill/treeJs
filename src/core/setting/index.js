@@ -39,7 +39,7 @@ export default class Setting {
       } else {
         _setting.search = DEFAULT_SETTING.search
       }
-      // 树的数据
+
       if (ObjectIs(setting.tree, 'object')) {
         _setting.tree = Object.assign({}, DEFAULT_SETTING.tree, setting.tree)
       } else {
@@ -62,4 +62,12 @@ export default class Setting {
 
   get tree () { return SETTING.tree }
 
+  static updateTreeOption (tree) {
+    if (ObjectIs(tree, 'object')) {
+      SETTING.tree = Object.assign({}, DEFAULT_SETTING.tree, tree)
+    } else {
+      SETTING.tree = DEFAULT_SETTING.tree
+    }
+    return SETTING.tree
+  }
 }

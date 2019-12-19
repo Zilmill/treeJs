@@ -1,6 +1,5 @@
 import _cloneDeep from 'lodash/cloneDeep'
 import { ObjectIs } from '../../util/validation'
-import _keyBy from 'lodash/keyBy'
 import md5 from '../../util/md5'
 import _filter from 'lodash/filter'
 import {
@@ -9,7 +8,9 @@ import {
   onHandleExpend,
   isOpenExpend,
   isChecked,
-  onHandleChecked } from './view'
+  onHandleChecked,
+  clearView } from './view'
+import Setting from '../setting'
 
 /**
  * 树
@@ -39,6 +40,8 @@ export default class TreeRender {
 
     // 当前项的子集
     this.childData = {}
+
+    clearView(this._parent)
   }
 
   /**
@@ -46,8 +49,7 @@ export default class TreeRender {
    * @param key
    * @returns {*}
    */
-  getKey (key) { return key ? md5(key) : '' }
-
+  getKey (key, pid) { return key ? md5(pid ? `${key}${pid}` : key) : '' }
 
   /**
    * 先把提供的数据转化为平级的，再进行数据处理
@@ -56,9 +58,13 @@ export default class TreeRender {
    * @returns {Promise<void>}
    */
   async formatData (data, option) {
-    const _data = _cloneDeep(data)
-
     this.original = data
+
+    let _data = _cloneDeep(data)
+
+    if (ObjectIs(data, 'object')) {
+      _data = _cloneDeep(Object.keys(data).map(k => data[k]))
+    }
 
     // 按提供的层级分
     let level = option.level
@@ -75,8 +81,9 @@ export default class TreeRender {
     // 生成指定数据
     level.forEach((key, index) => {
       _data.forEach(_item => {
-        const id = this.getKey(_item[key])
-        const pid = this.getKey(_item[level[index - 1]])
+        // 此id可能重复，需要更改
+        const pid = this.getKey(_item[level[index - 1]], _item[level[index - 2]])
+        const id = this.getKey(_item[key], _item[level[index - 1]])
         this._data[id] = Object.assign({}, _item, {
           _tree_node_id: id,
           _tree_node_pid: pid,
@@ -110,10 +117,10 @@ export default class TreeRender {
   async updateTree (data, option) {
     this.reset()
 
-    this.option = option
+    this.option = Setting.updateTreeOption(option)
 
     // 生成平级数据
-    const _data = await this.formatData(data, option)
+    const _data = await this.formatData(data, this.option)
 
     this._tree_data = await this.formatDataToTree(_data)
 
