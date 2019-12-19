@@ -46,7 +46,11 @@
 			}
 		}
 
-		const tree_option = {}
+		const tree_option = {
+			onCheck (ids) {
+				console.log('ids', ids)
+			}
+		}
 
 		var space_option = Object.assign({}, tree_option, {
 			level: ['ModelID', 'majorParent', 'CategoryId'],

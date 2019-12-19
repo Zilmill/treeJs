@@ -180,6 +180,8 @@ export default class TreeRender {
    */
   async check (item, e) {
     e.stopPropagation()
+    let checkedIds = []
+
     const childData = await this.getChildData(item)
 
     const id = item._tree_node_id
@@ -193,10 +195,16 @@ export default class TreeRender {
     // 子集全部勾选
     if (childData && childData.length) {
       childData.forEach(childId => {
-        this._data[childId]._tree_node_checked = toChecked
-        this._data[childId]._tree_node_check_half = false
+        const item = this._data[childId]
+        item._tree_node_checked = toChecked
+        item._tree_node_check_half = false
         onHandleChecked(childId, toChecked, false)
+        if (!(item._tree_node_children && item._tree_node_children)) {
+          checkedIds.push(item)
+        }
       })
+    } else {
+      checkedIds.push(item)
     }
 
     // 父级判断是否选择
@@ -204,6 +212,8 @@ export default class TreeRender {
       onHandleChecked(pid, checked, half)
     })
 
+    // 回调选择
+    this.onChecked(checkedIds)
   }
 
   /**
@@ -238,6 +248,16 @@ export default class TreeRender {
       recursive(parentItem._tree_node_pid)
     }
     recursive(item._tree_node_pid)
+  }
+
+  /**
+   * 监听选择
+   * @param checkedIds
+   */
+  onChecked (checkedIds) {
+    if (ObjectIs(this.option.onCheck, 'function')) {
+      this.option.onCheck(checkedIds)
+    }
   }
 
   /**

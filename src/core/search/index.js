@@ -1,5 +1,6 @@
 import { ObjectIs } from '../../util/validation'
 import { createSearchParent, createSearchInput, createSearchSubmit } from './view'
+import timeout from '../../util/timeout'
 
 /**
  * 搜索框
@@ -81,20 +82,29 @@ export default class SearchRender {
 
   onChange (e) {
     this.emit('onChange', e)
+    this.startSearch()
   }
 
   onBlur (e) {
     this.emit('onChange', e)
+    this.startSearch()
   }
 
   onSubmit () {
     this.emit('onChange')
+    this.startSearch()
   }
 
   emit (key, e) {
     if (this._option[key] && ObjectIs(this._option[key], 'function')) {
       this._option[key](e, this.input_el.value)
     }
+  }
+
+  async startSearch () {
+    await timeout(500)
+    const val = this.input_el.value
+    console.log('val', val)
   }
 }
 
