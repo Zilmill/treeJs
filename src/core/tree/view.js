@@ -1,6 +1,8 @@
-import { createElement } from '../../util/jsx'
+import {createElement} from '../../util/jsx'
 import { ObjectIs } from '../../util/validation'
 import { elementFind, removeElement } from '../../util/dom'
+
+let EmptyElement = null
 
 /**
  * 头部ID
@@ -54,6 +56,9 @@ export function isChecked (nodeIdOrEl) {
 export function clearView (parent) {
   const ul = elementFind(parent, 'tree_ul')
   removeElement(ul)
+  if (EmptyElement) {
+    removeElement(EmptyElement)
+  }
 }
 
 /**
@@ -162,6 +167,14 @@ export function onHandleChecked (nodeId, checked, half) {
     header.classList.remove('half')
     header.classList.remove('checked')
   }
+}
+
+/**
+ * 显示空
+ */
+export function showEmpty (parent) {
+  if (EmptyElement) { return }
+  EmptyElement = createElement(parent, 'div', { class: 'treeJs_empty' }, '无内容')
 }
 
 

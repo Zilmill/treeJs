@@ -87,7 +87,6 @@ export default class SearchRender {
 
   onBlur (e) {
     this.emit('onChange', e)
-    this.startSearch()
   }
 
   onSubmit () {
@@ -101,10 +100,22 @@ export default class SearchRender {
     }
   }
 
+  /**
+   * 搜索数据
+   * @returns {Promise<void>}
+   */
   async startSearch () {
     await timeout(500)
     const val = this.input_el.value
-    console.log('val', val)
+    if (this._onHandleSearch) {
+      this._onHandleSearch(val)
+    }
+  }
+
+  onSearch (call) {
+    if (ObjectIs(call, 'function')) {
+      this._onHandleSearch = call
+    }
   }
 }
 

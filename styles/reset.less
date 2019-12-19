@@ -1,36 +1,5 @@
 @import "base";
-/*清除默认样式*/
-*{
-  margin: 0;
-  padding: 0;
-}
-li{
-  list-style: none;
-}
-input,button,textarea{
-  outline: none;
-  -webkit-appearance: none;
-  border-radius: 0;
-  border:none;
-  background-color: #fff;
-  font-family:-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-button{
-  cursor: pointer;
-  &:disabled{
-    background-color: #f0f0f0!important;
-  }
-}
-/*盒模型，padding尺寸不用再减去*/
-*,
-*:before,
-*:after {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-tap-highlight-color: transparent;
-}
+
 body,html{
   width: 100%;
   height:100%;

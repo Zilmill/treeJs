@@ -33,7 +33,6 @@
     "terser": "^4.4.2"
   },
   "dependencies": {
-    "js-md5": "^0.7.3",
     "lodash": "^4.17.15"
   },
   "scripts": {

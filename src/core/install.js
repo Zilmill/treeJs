@@ -31,6 +31,7 @@ export class Install {
    * @returns {Promise<void>}
    */
   async render () {
+    if (this.root) { return }
     // 创建最外层父级
     this.root = await new ParentRender(this.setting.parent, this.el)
 
@@ -39,5 +40,17 @@ export class Install {
 
     // 创建树
     this.tree = await new TreeRender(this.setting.tree, this.setting.data, this.root)
+
+    // 监听搜索
+    this.search.onSearch(val => {
+      this.find(val)
+    })
+  }
+
+  /**
+   * 更新结构树数据
+   */
+  find (val, option) {
+    return this.tree.find(val, option)
   }
 }

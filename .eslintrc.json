@@ -19,14 +19,17 @@
       "unix"
     ],
     "quotes": [
-      "error",
+      "off",
       "single"
     ],
     "semi": [
-      "error",
+      "off",
       "never"
     ],
     "no-console": [
+      "off"
+    ],
+    "require-atomic-updates": [
       "off"
     ]
   }

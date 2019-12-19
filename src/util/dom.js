@@ -1,4 +1,3 @@
-import { ObjectIs } from './validation'
 /**
  * 根据给定的获取Dom
  * @param elOrIdOrClassname

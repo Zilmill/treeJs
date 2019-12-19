@@ -9,7 +9,8 @@ import {
   isOpenExpend,
   isChecked,
   onHandleChecked,
-  clearView } from './view'
+  clearView,
+  showEmpty } from './view'
 import Setting from '../setting'
 
 /**
@@ -21,14 +22,14 @@ export default class TreeRender {
     this.reset()
     this._parent = parent
 
+    // 原始数据
+    this.original = null
+
     return this.updateTree(data, option)
   }
 
   reset () {
     this._data = {}
-
-    // 原始数据
-    this.original = null
 
     // 配置
     this.option = {}
@@ -60,7 +61,6 @@ export default class TreeRender {
    * @returns {Promise<void>}
    */
   async formatData (data, option) {
-    this.original = data
 
     let _data = _cloneDeep(data)
 
@@ -125,7 +125,9 @@ export default class TreeRender {
    * @param option
    * @returns {Promise<TreeRender>}
    */
-  async updateTree (data, option) {
+  async updateTree (data, option, isFind) {
+    if (!isFind) { this.original = data }
+
     this.reset()
 
     this.option = Setting.updateTreeOption(option)
@@ -344,5 +346,50 @@ export default class TreeRender {
       }
     }
     return { checked, has: checked ? true : !!total }
+  }
+
+  /**
+   * 通过名称搜索
+   * 或者匹配任意字符
+   * 优先通过level_title字段
+   * @param nameOrKeyValue
+   */
+  find (value, option) {
+    const _option = Object.assign({}, this.option, option)
+    if (!value) {
+      this.updateTree(this.original, _option)
+      return []
+    }
+    const reg = new RegExp(value, 'ig')
+    let result = []
+    let titles = _option.level_title
+    if (!Array.isArray(titles)) { titles = [titles] }
+
+    const recursive = item => {
+      // 按标题查找
+      for (let i = 0; i < titles.length; i++) {
+        const title = titles[i]
+        const val = item[title]
+        if (reg.test(val)) { result.push(item) }
+      }
+      // TODO 支持按其他字段查
+    }
+
+    if (ObjectIs(this.original, 'array')) {
+      for (let i = 0; i < this.original.length; i++) {
+        recursive(this.original[i])
+      }
+    } else if (ObjectIs(this.original, 'object')) {
+      for (let i in this.original) {
+        recursive(this.original[i])
+      }
+    }
+
+    console.log('result', result)
+    this.updateTree(result, _option, true)
+
+    if (!(result && result.length)) { showEmpty(this._parent) }
+
+    return result
   }
 }

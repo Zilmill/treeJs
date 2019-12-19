@@ -6,7 +6,7 @@
  * 类型错了，也代表无配置
  */
 import _cloneDeep from 'lodash/cloneDeep'
-import { ObjectIs, isFalse } from '../../util/validation'
+import { ObjectIs } from '../../util/validation'
 import DEFAULT_SETTING from './setting.default'
 
 let SETTING = null
