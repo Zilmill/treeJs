@@ -1,0 +1,140 @@
+@import "base";
+
+.treeJs{
+  width: 360px;
+  height: 100%;
+  @padding-left: 20px;
+  @search-height: 32px;
+  @space: 10px;
+  .tree_search_el{
+    width: 100%;
+    @submitWidth: 48px;
+    padding:@space @padding-left;
+    display: flex;
+    justify-content: space-between;
+    .tree_search_input{
+      border: 1px solid #ebebeb;
+      position: relative;
+      width: calc(100% - @submitWidth - @space);
+      height: @search-height;
+      background-color: #fff;
+      input{
+        width: 100%;
+        height: 100%;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        padding: 0 15px;
+        font-size: 14px;
+        color: #333;
+      }
+    }
+    .tree_search_submit{
+      width: 48px;
+      height: 32px;
+      background-color: @mainColor;
+      font-size: 14px;
+      color: #fff;
+      border-radius:4px;
+    }
+  }
+  .tree_ul{
+    width: 100%;
+    //height: calc(100% - @search-height - @space * 2);
+    //.overflow-auto();
+    .tree_ul{
+      background-color: fade(#000, 1.5);
+      padding-left: 10px;
+    }
+    .tree_header{
+      height: 40px;
+      padding: 0 (@padding-left + 10px) 0 (@padding-left + 2px);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .tree_header_fold{
+        width: 30px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        &::before{
+          transition: all 0.2s;
+          content: "";
+          display: inline-block;
+          border-left: 6px solid #333;
+          border-top: 6px solid transparent;
+          border-bottom: 6px solid transparent;
+        }
+      }
+      .tree_header_label{
+        font-size:14px;
+        font-weight:400;
+        color:rgba(28,43,54,1);
+        flex: 1;
+      }
+      .tree_header_check{
+        width:12px;
+        height:12px;
+        background:rgba(255,255,255,1);
+        border:1px solid rgba(204,204,204,1);
+        transition: all 0.2s;
+      }
+      &.no-child{
+        .tree_header_fold{
+          &:before{
+            display: none;
+          }
+        }
+      }
+      &.open{
+        .tree_header_fold{
+          &::before{
+            transform: rotate(90deg);
+          }
+        }
+      }
+      &.checked{
+        .tree_header_check{
+          position: relative;
+          background-color: @mainColor;
+          border: 1px solid @mainColor;
+          &::before{
+            content: "";
+            position: absolute;
+            display: inline-block;
+            width: 4px;
+            height: 2px;
+            background-color: #fff;
+            transform: rotate(45deg);
+            top: 5px;
+          }
+          &::after{
+            content: "";
+            position: absolute;
+            display: inline-block;
+            width: 9px;
+            height: 2px;
+            background-color: #fff;
+            transform: rotate(-45deg);
+            top: 4px;
+            left: 2px;
+          }
+        }
+        &.half{
+          .tree_header_check{
+            &::before{
+              display: none;
+            }
+            &::after{
+              transform: rotate(0);
+              width: 6px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

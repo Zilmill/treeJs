@@ -32,10 +32,13 @@
     "serve": "^11.2.0",
     "terser": "^4.4.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "js-md5": "^0.7.3",
+    "lodash": "^4.17.15",
+    "uuid": "^3.3.3"
+  },
   "scripts": {
     "build": "rollup -c",
-
     "watch": "rollup -c -w",
     "dev": "TARGET=iife npm-run-all --parallel watch"
   }

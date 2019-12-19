@@ -4,19 +4,65 @@
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width'>
 	<title>demo</title>
+	<link rel="stylesheet" href="./styles/reset.css">
+	<link rel="stylesheet" href="./styles/index.css">
 
-	<style>
-		body {
-			font-family: 'Helvetica Neue', Arial, sans-serif;
-			color: #333;
-			font-weight: 300;
-		}
-	</style>
 </head>
 <body>
 	<script src='./dist/index.js'></script>
 	<script>
-		new Treejs()
+		console.log('Treejs', Treejs)
+
+		const all = {
+			'db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@0f71c4b2acb96e46efa6c889ce2260ae': {
+				CategoryId: "0f71c4b2acb96e46efa6c889ce2260ae",
+				CategoryName: "挂衣钩",
+				ModelID: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8",
+				ProjectID: 13,
+				RealName: "挂衣钩",
+				key: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@0f71c4b2acb96e46efa6c889ce2260ae",
+				length: 6,
+				majorParent: "其他",
+				majorSize: 203717,
+				modelName: "9F",
+				modelSize: 52346320,
+				toFirstLoad: false,
+				_key: "13@db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@0f71c4b2acb96e46efa6c889ce2260ae"
+			},
+			'db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543': {
+				CategoryId: "2be9a3a381a6f00a73812189906ec543",
+				CategoryName: "石材线条",
+				ModelID: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8",
+				ProjectID: 13,
+				RealName: "石材线条",
+				key: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543",
+				length: 883,
+				majorParent: "其他",
+				majorSize: 2520352,
+				modelName: "9F",
+				modelSize: 52346320,
+				toFirstLoad: false,
+				_key: "13@db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543"
+			}
+		}
+
+		const tree_option = {}
+
+		var space_option = Object.assign({}, tree_option, {
+			level: ['ModelID', 'majorParent', 'CategoryId'],
+			level_title: ['modelName', 'majorParent', 'RealName']
+		})
+
+		var major_option = Object.assign({}, tree_option, {
+			level: ['majorParent', 'CategoryId', 'ModelID'],
+			level_title: ['majorParent', 'RealName', 'modelName']
+		})
+
+		var tree = new Treejs.install('#tree', {
+			data: all,
+			tree: space_option
+		})
+		console.log('tree', tree)
 	</script>
 </body>
 </html>

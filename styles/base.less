@@ -1,0 +1,40 @@
+@errorColor: #f44;
+@mainColor: #F1AC45;
+
+/*页面滚动*/
+.overflow-auto(@w:3px){
+  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  /* 设置滚动条的样式 */
+  &::-webkit-scrollbar {
+    width:@w;
+    position: absolute;
+    right: 0;
+  }
+  /* 滚动槽 */
+  &::-webkit-scrollbar-track {
+    border-radius:@w;
+  }
+  /* 滚动条滑块 */
+  &::-webkit-scrollbar-thumb {
+    border-radius:@w;
+    background:rgba(0,0,0,0.7);
+  }
+  &::-webkit-scrollbar-thumb:window-inactive {
+    background:rgba(0,0,0,0.7);
+  }
+}
+
+.button(@color:#333,@w:90px,@h:30px){
+  background-color: @color;
+  color: #fff;
+  width: @w;
+  height: @h;
+  font-size: 12px;
+  margin-left: @default_padding_left;
+  &:active{
+    background-color: darken(@color, 90%);
+  }
+}
