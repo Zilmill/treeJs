@@ -3,9 +3,11 @@
  */
 import { createElement, createVnode } from './jsx'
 import md5 from './md5'
+import timeout from './timeout'
 
 export default {
   createElement,
   md5,
+  timeout,
   createVnode
 }

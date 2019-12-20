@@ -9,7 +9,7 @@
 
 </head>
 <body>
-	<script src='./dist/index.js'></script>
+	<script src='./dist/Treejs.js'></script>
 	<script>
 		console.log('Treejs', Treejs)
 
@@ -62,11 +62,16 @@
 			level_title: ['majorParent', 'RealName', 'modelName']
 		})
 
-		var tree = new Treejs.install('#tree', {
+		var tree = null
+
+		new Treejs.install('#tree', {
 			data: all,
 			tree: major_option
+		}).then(_tree => {
+			tree = _tree
+			console.log('tree', tree)
 		})
-		console.log('tree', tree)
+
 		// tree.tree.updateTree(all, major_option)
 	</script>
 </body>

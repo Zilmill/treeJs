@@ -12,10 +12,7 @@ export class Install {
     this._elOrIdOrClassname = elOrIdOrClassname
     this.setting = new Setting(settingOrData)
 
-    console.log('将要放入的元素:', this._elOrIdOrClassname, this.el)
-    console.log('配置信息:', this.setting)
-
-    this.render()
+    return this.render()
   }
 
   /**
@@ -43,8 +40,10 @@ export class Install {
 
     // 监听搜索
     this.search.onSearch(val => {
-      this.find(val)
+      this.searchUpdateUI(val)
     })
+
+    return this
   }
 
   /**
@@ -52,5 +51,44 @@ export class Install {
    */
   find (val, option) {
     return this.tree.find(val, option)
+  }
+
+  /**
+   * 搜索功能
+   * @param val
+   * @param option
+   */
+  searchUpdateUI (val, option) {
+    this.tree.searchUpdateUI(val, option)
+  }
+
+  /**
+   * 选择某个
+   * @param value
+   * @param key
+   * @param bool
+   */
+  checkSomeOne (value, key, bool, needEmit) {
+    this.tree.checkSomeOne(value, key, bool, needEmit)
+  }
+
+  /**
+   * 获取当前已经选中的
+   * @param data
+   * @param withParent
+   */
+  getAllChecked (data, withParent) {
+    return this.tree.getAllChecked(data, withParent)
+  }
+
+  /**
+   * 更新树
+   * @param data
+   * @param option
+   * @param isFind
+   * @returns {*|Promise<TreeRender>}
+   */
+  updateTree (data, option, isFind) {
+    return this.tree.updateTree(data, option, isFind)
   }
 }

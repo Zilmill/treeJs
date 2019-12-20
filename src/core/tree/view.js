@@ -57,7 +57,7 @@ export function clearView (parent) {
   const ul = elementFind(parent, 'tree_ul')
   removeElement(ul)
   if (EmptyElement) {
-    removeElement(EmptyElement)
+    removeElement(EmptyElement);
   }
 }
 
@@ -173,7 +173,7 @@ export function onHandleChecked (nodeId, checked, half) {
  * 显示空
  */
 export function showEmpty (parent) {
-  if (EmptyElement) { return }
+  console.log('EmptyElement', EmptyElement)
   EmptyElement = createElement(parent, 'div', { class: 'treeJs_empty' }, '无内容')
 }
 

@@ -50,7 +50,7 @@ export function removeElement (els) {
   if (!Array.isArray(els)) { els = [els] }
   for (let i = 0; i < els.length; i++) {
     const item = els[i]
-    if (item) {
+    if (item && item.parentNode) {
       item.parentNode.removeChild(item)
     }
   }

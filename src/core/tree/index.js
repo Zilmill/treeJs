@@ -7,15 +7,14 @@ import {
   bindHeaderClickEvent,
   onHandleExpend,
   isOpenExpend,
-  isChecked,
   onHandleChecked,
   clearView,
   showEmpty } from './view'
 import Setting from '../setting'
+import UUID from '../../util/uuid'
 
 /**
  * 树
- * TODO data为数组时
  */
 export default class TreeRender {
   constructor (option, data, parent) {
@@ -30,6 +29,8 @@ export default class TreeRender {
 
   reset () {
     this._data = {}
+
+    this.uuid = UUID()
 
     // 配置
     this.option = {}
@@ -51,7 +52,8 @@ export default class TreeRender {
    * @returns {*}
    */
   getKey (key, pid) {
-    return key ? md5(pid ? `${key}${pid}` : key.toString()) : ''
+    const _key = key ? (pid ? `${key}${pid}` : key.toString()) : ''
+    return key ? md5(`${_key}${this.uuid}`) : ''
   }
 
   /**
@@ -130,7 +132,7 @@ export default class TreeRender {
 
     this.reset()
 
-    this.option = Setting.updateTreeOption(option)
+    this.option = !option ? this.option : Setting.updateTreeOption(option)
 
     // 生成平级数据
     const _data = await this.formatData(data, this.option)
@@ -190,15 +192,20 @@ export default class TreeRender {
    * 同时handle一个
    * @param item
    * @param e
+   * @param needEmit 是否需要触发回调
    */
-  async check (item, e) {
-    e.stopPropagation()
+  async check (item, e, bool, needEmit) {
+    if (e) { e.stopPropagation() }
+
     let checkedIds = []
 
     const childData = await this.getChildData(item)
 
     const id = item._tree_node_id
-    const toChecked = !isChecked(id)
+    let toChecked = !this.isChecked(item)
+
+    if (ObjectIs(bool, 'boolean')) { toChecked = bool }
+    if (!ObjectIs(needEmit, 'boolean')) { needEmit = true }
 
     // 切换当前项选择
     item._tree_node_checked = toChecked
@@ -212,7 +219,7 @@ export default class TreeRender {
         item._tree_node_checked = toChecked
         item._tree_node_check_half = false
         onHandleChecked(childId, toChecked, false)
-        if (!(item._tree_node_children && item._tree_node_children)) {
+        if (!(item._tree_node_children && item._tree_node_children.length)) {
           checkedIds.push(item)
         }
       })
@@ -226,7 +233,19 @@ export default class TreeRender {
     })
 
     // 回调选择
-    this.onChecked(checkedIds)
+    if (needEmit) { this.onChecked(checkedIds, toChecked) }
+  }
+
+  /**
+   * 判断是否选中
+   * @param item
+   * @returns {boolean}
+   */
+  isChecked (item) {
+    if (!item) { return false }
+    if (item._tree_node_checked) { return true }
+    if (item._tree_node_check_half) { return true }
+    return false
   }
 
   /**
@@ -354,15 +373,12 @@ export default class TreeRender {
    * 优先通过level_title字段
    * @param nameOrKeyValue
    */
-  find (value, option) {
-    const _option = Object.assign({}, this.option, option)
-    if (!value) {
-      this.updateTree(this.original, _option)
-      return []
-    }
+  find (value, _option) {
+    if (!_option) { _option = {} }
     const reg = new RegExp(value, 'ig')
     let result = []
-    let titles = _option.level_title
+    let titles = _option.level_title || this.option.tree.level_title
+    const data = _option.data || this.original
     if (!Array.isArray(titles)) { titles = [titles] }
 
     const recursive = item => {
@@ -370,26 +386,93 @@ export default class TreeRender {
       for (let i = 0; i < titles.length; i++) {
         const title = titles[i]
         const val = item[title]
-        if (reg.test(val)) { result.push(item) }
-      }
-      // TODO 支持按其他字段查
-    }
-
-    if (ObjectIs(this.original, 'array')) {
-      for (let i = 0; i < this.original.length; i++) {
-        recursive(this.original[i])
-      }
-    } else if (ObjectIs(this.original, 'object')) {
-      for (let i in this.original) {
-        recursive(this.original[i])
+        const isSame = reg.test(val) || val === value
+        if (isSame) { result.push(item) }
       }
     }
 
-    console.log('result', result)
+    if (ObjectIs(data, 'array')) {
+      for (let i = 0; i < data.length; i++) {
+        recursive(data[i])
+      }
+    } else if (ObjectIs(data, 'object')) {
+      for (let i in data) {
+        recursive(data[i])
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * 搜索并更改UI
+   * @param val
+   * @param option
+   * @returns {null}
+   */
+  searchUpdateUI (val, option) {
+    const _option = Object.assign({}, this.option, option)
+    if (!val) {
+      this.updateTree(this.original, _option)
+      return null
+    }
+    const result = this.find(val, _option)
+
     this.updateTree(result, _option, true)
 
     if (!(result && result.length)) { showEmpty(this._parent) }
+  }
 
-    return result
+  /**
+   * 主动选中或取消选中某些
+   * 如果已经展开了，直接勾选上，如果没有展开，只改变数据
+   * @param key
+   * @param value
+   */
+  checkSomeOne (value, key, bool, needEmit) {
+    if (!Array.isArray(value)) { value = [value] }
+    if (!key) {
+      key = this.option.level_title
+    }
+    if (!Array.isArray(key)) { key = [key] }
+    let arr = []
+    value.forEach(item => {
+      const result = this.find(item, { data: this._data, level_title: key })
+      if (result && result.length) {
+        arr = arr.concat(
+          result.filter(_item => {
+            return !(_item._tree_node_children && _item._tree_node_children.length)
+          })
+        )
+      }
+    })
+    arr.forEach(async (item) => {
+      this.check(item, null, bool, needEmit)
+    })
+  }
+
+  /**
+   * 获取当前已经被选中的
+   * @param data
+   * @param withParent
+   * @returns {Array}
+   */
+  getAllChecked (data, withParent) {
+    const _data = data || this._data
+    let arr = []
+    for (let key in _data) {
+      const item = _data[key]
+      if (item._tree_node_checked) {
+        if (withParent) {
+          arr.push(item)
+        } else {
+          if (!(item._tree_node_children && item._tree_node_children.length)) {
+            arr.push(item)
+          }
+        }
+      }
+    }
+
+    return arr
   }
 }
