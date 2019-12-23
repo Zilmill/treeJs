@@ -286,9 +286,9 @@ export default class TreeRender {
    * 监听选择
    * @param checkedIds
    */
-  onChecked (checkedIds) {
+  onChecked (checkedIds, bool) {
     if (ObjectIs(this.option.onCheck, 'function')) {
-      this.option.onCheck(checkedIds)
+      this.option.onCheck(checkedIds, bool)
     }
   }
 
