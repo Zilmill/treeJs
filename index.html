@@ -15,7 +15,7 @@
 
 		var all = {
 			'db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@0f71c4b2acb96e46efa6c889ce2260ae': {
-				CategoryId: "0f71c4b2acb96e46efa6c889ce2260ae",
+				CategoryId: "2be9a3a381a6f00a73812189906ec543",
 				CategoryName: "挂衣钩",
 				ModelID: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8",
 				ProjectID: 13,
@@ -32,14 +32,14 @@
 			'db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543': {
 				CategoryId: "2be9a3a381a6f00a73812189906ec543",
 				CategoryName: "石材线条",
-				ModelID: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8",
+				ModelID: "db2d212321312-4a38-8bf5-30631a0e61a8",
 				ProjectID: 13,
-				RealName: "石材线条",
+				RealName: "挂衣钩",
 				key: "db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543",
 				length: 883,
 				majorParent: "其他",
 				majorSize: 2520352,
-				modelName: "9F",
+				modelName: "10F",
 				modelSize: 12312312,
 				toFirstLoad: false,
 				_key: "13@db2d22a6-5ca4-4a38-8bf5-30631a0e61a8@2be9a3a381a6f00a73812189906ec543"
@@ -53,8 +53,14 @@
 		}
 
 		var space_option = Object.assign({}, tree_option, {
-			level: ['ModelID', 'majorParent', 'CategoryId'],
-			level_title: ['modelName', 'majorParent', 'RealName']
+			level: ['ModelID', 'majorParent', 'CategoryId', 'modelSize'],
+			level_title: ['modelName', 'majorParent', 'RealName', 'modelSize'],
+			slot: {
+				item_other (item, parent) {
+					console.log('item', item)
+					console.log('parent', parent)
+				}
+			}
 		})
 
 		var major_option = Object.assign({}, tree_option, {
@@ -66,7 +72,7 @@
 
 		new Treejs.install('#tree', {
 			data: all,
-			tree: major_option
+			tree: space_option
 		}).then(_tree => {
 			tree = _tree
 			console.log('tree', tree)

@@ -47,13 +47,17 @@ export default class TreeRender {
   }
 
   /**
-   * 转化Key
-   * @param key
-   * @returns {*}
+   * 转化key值
+   * @param index
+   * @param arr
+   * @param info
+   * @returns {any | Promise<any>}
    */
-  getKey (key, pid) {
-    const _key = key ? (pid ? `${key}${pid}` : key.toString()) : ''
-    return key ? md5(`${_key}${this.uuid}`) : ''
+  getKey (index, arr, info) {
+    const _arr = arr.slice(0, index)
+    const valArr = _arr.map(item => info[item])
+    const id = valArr && valArr.length ? md5(`${valArr.join('@')}${this.uuid}`) : ''
+    return id
   }
 
   /**
@@ -82,15 +86,14 @@ export default class TreeRender {
     if (!ObjectIs(option.level_title, 'array')) {
       level_title = []
     }
+
     // 生成指定数据
     _data.forEach(_item => {
       level.forEach((key, index) => {
         const val = _item[key]
         if (ObjectIs(val, 'string') || ObjectIs(val, 'number')) {
-          const prevKey = level[index - 1]
-          const preVal = _item[prevKey]
-          const pid = this.getKey(preVal, _item[level[index - 2]])
-          const id = this.getKey(val, preVal)
+          const pid = this.getKey(index, level, _item)
+          const id = this.getKey(index + 1, level, _item)
           const title_key = level_title[index]
 
           this._data[id] = Object.assign({}, _item, {
@@ -130,9 +133,11 @@ export default class TreeRender {
   async updateTree (data, option, isFind) {
     if (!isFind) { this.original = data }
 
+    const _option = !option ? this.option : Setting.updateTreeOption(option)
+
     this.reset()
 
-    this.option = !option ? this.option : Setting.updateTreeOption(option)
+    this.option = _option
 
     // 生成平级数据
     const _data = await this.formatData(data, this.option)
@@ -158,7 +163,7 @@ export default class TreeRender {
       arr = data
     }
     arr.forEach(item => {
-      if (!parent) { parent = document.getElementById(item._tree_node_pid) }
+      if (!parent) { parent = document.getElementById(item._tree_node_pid) || this._parent }
       createContent(parent, item, this.option)
       // 绑定事件
       bindHeaderClickEvent(item, (_item, e) => {
@@ -463,6 +468,31 @@ export default class TreeRender {
     for (let key in _data) {
       const item = _data[key]
       if (item._tree_node_checked) {
+        if (withParent) {
+          arr.push(item)
+        } else {
+          if (!(item._tree_node_children && item._tree_node_children.length)) {
+            arr.push(item)
+          }
+        }
+      }
+    }
+
+    return arr
+  }
+
+  /**
+   * 获取所有未被选中的
+   * @param data
+   * @param withParent
+   * @returns {Array}
+   */
+  getAllNotChecked (data, withParent) {
+    const _data = data || this._data
+    let arr = []
+    for (let key in _data) {
+      const item = _data[key]
+      if (!item._tree_node_checked) {
         if (withParent) {
           arr.push(item)
         } else {

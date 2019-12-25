@@ -91,4 +91,13 @@ export class Install {
   updateTree (data, option, isFind) {
     return this.tree.updateTree(data, option, isFind)
   }
+
+  /**
+   * 获取所有未被选中的
+   * @param data
+   * @param withParent
+   */
+  getAllNotChecked (data, withParent) {
+    return this.tree.getAllNotChecked(data, withParent)
+  }
 }
