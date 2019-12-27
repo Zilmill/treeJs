@@ -4,10 +4,12 @@
 import { createElement, createVnode } from './jsx'
 import md5 from './md5'
 import timeout from './timeout'
+import { formatBytes } from './format'
 
 export default {
   createElement,
   md5,
   timeout,
+  formatBytes,
   createVnode
 }

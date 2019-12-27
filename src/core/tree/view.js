@@ -110,6 +110,12 @@ export function createContent(parent, item, option) {
     if (ui_key === 'check') { checkEl = el }
   })
 
+  // 允许在每一级增加额外的东西
+  if (ObjectIs(option.item_header_child_slot, 'function')) {
+    const vnode =  option.item_header_child_slot(header, item)
+    if (vnode) { vnode.classList.add('tree_header_other') }
+  }
+
   return {
     header: header,
     check: checkEl

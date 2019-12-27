@@ -24,13 +24,15 @@ export default {
   tree: {
     level: [],
     level_title: [],
+    onCheck: null,
     item_attrs: { class: 'tree_ul' },
     item_header_attrs: { class: 'tree_header' },
     item_content_attrs: { class: 'tree_content' },
     // TODO item_header_slot: null,
-    // TODO item_fold_slot: null,
-    // TODO item_check_slot: null,
-    // TODO item_title_slot: null,
+    // TODO item_header_fold_slot: null,
+    // TODO item_header_check_slot: null,
+    // TODO item_header_title_slot: null,
+    item_header_child_slot: null,
     item_ui_sort: ['fold', 'label', 'check']
   }
 }
