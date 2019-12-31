@@ -47,12 +47,11 @@
 		}
 
 		const tree_option = {
+			search_option: ['modelSize'],
 			onCheck (ids) {
 				console.log('ids', ids)
 			},
 			item_header_child_slot (parent, item) {
-				console.log('parent', parent)
-				console.log('item', item)
 				if (!item._tree_node_pid) {
 					return Treejs.util.createElement(parent, 'div', null, `此模型大小：${Treejs.util.formatBytes(item.modelSize)}`)
 				}
@@ -69,8 +68,8 @@
 		}
 
 		var space_option = Object.assign({}, tree_option, {
-			level: ['ModelID', 'majorParent', 'CategoryId', 'modelSize'],
-			level_title: ['modelName', 'majorParent', 'RealName', 'modelSize'],
+			level: ['ModelID', 'majorParent', 'CategoryId'],
+			level_title: ['modelName', 'majorParent', 'RealName'],
 			slot: {
 				item_other (item, parent) {
 					console.log('item', item)

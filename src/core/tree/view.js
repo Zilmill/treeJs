@@ -179,7 +179,6 @@ export function onHandleChecked (nodeId, checked, half) {
  * 显示空
  */
 export function showEmpty (parent) {
-  console.log('EmptyElement', EmptyElement)
   EmptyElement = createElement(parent, 'div', { class: 'treeJs_empty' }, '无内容')
 }
 

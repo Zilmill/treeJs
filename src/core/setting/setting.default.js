@@ -24,6 +24,7 @@ export default {
   tree: {
     level: [],
     level_title: [],
+    search_option: null,
     onCheck: null,
     item_attrs: { class: 'tree_ul' },
     item_header_attrs: { class: 'tree_header' },

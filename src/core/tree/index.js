@@ -382,7 +382,7 @@ export default class TreeRender {
     if (!_option) { _option = {} }
     const reg = new RegExp(value, 'ig')
     let result = []
-    let titles = _option.level_title || this.option.tree.level_title
+    let titles = _option.level_title || this.option.level_title
     const data = _option.data || this.original
     if (!Array.isArray(titles)) { titles = [titles] }
 
@@ -421,6 +421,11 @@ export default class TreeRender {
       this.updateTree(this.original, _option)
       return null
     }
+
+    if (ObjectIs(_option.search_option, 'array')) {
+      _option.level_title = _option.level_title.concat(_option.search_option)
+    }
+
     const result = this.find(val, _option)
 
     this.updateTree(result, _option, true)
