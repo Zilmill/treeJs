@@ -410,6 +410,31 @@ export default class TreeRender {
   }
 
   /**
+   * 筛选指定条件
+   * @param {Object|null} _option 
+   * @param {Function} callback 
+   */
+  filter (_option, callback) {
+    let result = []
+    if (!_option) { _option = {} }
+    const data = _option.data || this.original
+
+    if (ObjectIs(data, 'array')) {
+      for (let i = 0; i < data.length; i++) {
+        const res = callback && callback(data[i])
+        if (res) { result.push(data[i]) }
+      }
+    } else if (ObjectIs(data, 'object')) {
+      for (let i in data) {
+        const res = callback && callback(data[i])
+        if (res) { result.push(data[i]) }
+      }
+    }
+
+    return result
+  }
+
+  /**
    * 搜索并更改UI
    * @param val
    * @param option
