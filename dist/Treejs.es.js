@@ -1,6 +1,6 @@
 /*!
  * Treejs v1.1.7
- * (c) 2019-2019 Evan You
+ * (c) 2019-2020 Evan You
  * Released under the MIT License.
  */
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -11,6 +11,8 @@ function createCommonjsModule(fn, module) {
 
 var _typeof_1 = createCommonjsModule(function (module) {
 function _typeof(obj) {
+  "@babel/helpers - typeof";
+
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
     module.exports = _typeof = function _typeof(obj) {
       return typeof obj;
@@ -40,8 +42,7 @@ function _setPrototypeOf(o, p) {
 module.exports = _setPrototypeOf;
 });
 
-var construct = createCommonjsModule(function (module) {
-function isNativeReflectConstruct() {
+function _isNativeReflectConstruct() {
   if (typeof Reflect === "undefined" || !Reflect.construct) return false;
   if (Reflect.construct.sham) return false;
   if (typeof Proxy === "function") return true;
@@ -54,6 +55,9 @@ function isNativeReflectConstruct() {
   }
 }
 
+var isNativeReflectConstruct = _isNativeReflectConstruct;
+
+var construct = createCommonjsModule(function (module) {
 function _construct(Parent, args, Class) {
   if (isNativeReflectConstruct()) {
     module.exports = _construct = Reflect.construct;
@@ -506,7 +510,7 @@ var runtime = (function (exports) {
     return { __await: arg };
   };
 
-  function AsyncIterator(generator) {
+  function AsyncIterator(generator, PromiseImpl) {
     function invoke(method, arg, resolve, reject) {
       var record = tryCatch(generator[method], generator, arg);
       if (record.type === "throw") {
@@ -517,14 +521,14 @@ var runtime = (function (exports) {
         if (value &&
             typeof value === "object" &&
             hasOwn.call(value, "__await")) {
-          return Promise.resolve(value.__await).then(function(value) {
+          return PromiseImpl.resolve(value.__await).then(function(value) {
             invoke("next", value, resolve, reject);
           }, function(err) {
             invoke("throw", err, resolve, reject);
           });
         }
 
-        return Promise.resolve(value).then(function(unwrapped) {
+        return PromiseImpl.resolve(value).then(function(unwrapped) {
           // When a yielded Promise is resolved, its final value becomes
           // the .value of the Promise<{value,done}> result for the
           // current iteration.
@@ -542,7 +546,7 @@ var runtime = (function (exports) {
 
     function enqueue(method, arg) {
       function callInvokeWithMethodAndArg() {
-        return new Promise(function(resolve, reject) {
+        return new PromiseImpl(function(resolve, reject) {
           invoke(method, arg, resolve, reject);
         });
       }
@@ -582,9 +586,12 @@ var runtime = (function (exports) {
   // Note that simple async functions are implemented on top of
   // AsyncIterator objects; they just return a Promise for the value of
   // the final result produced by the iterator.
-  exports.async = function(innerFn, outerFn, self, tryLocsList) {
+  exports.async = function(innerFn, outerFn, self, tryLocsList, PromiseImpl) {
+    if (PromiseImpl === void 0) PromiseImpl = Promise;
+
     var iter = new AsyncIterator(
-      wrap(innerFn, outerFn, self, tryLocsList)
+      wrap(innerFn, outerFn, self, tryLocsList),
+      PromiseImpl
     );
 
     return exports.isGeneratorFunction(outerFn)
@@ -1103,6 +1110,44 @@ try {
 });
 
 var regenerator = runtime_1;
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+var asyncToGenerator = _asyncToGenerator;
 
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
@@ -3673,9 +3718,7 @@ var DEFAULT_SETTING = {
 
 var SETTING = null;
 
-var Setting =
-/*#__PURE__*/
-function () {
+var Setting = /*#__PURE__*/function () {
   function Setting(setting) {
     classCallCheck(this, Setting);
 
@@ -3879,9 +3922,7 @@ function createSearchSubmit(parent, attrs, label) {
  * 搜索框
  */
 
-var SearchRender =
-/*#__PURE__*/
-function () {
+var SearchRender = /*#__PURE__*/function () {
   function SearchRender(option, parent) {
     classCallCheck(this, SearchRender);
 
@@ -4001,29 +4042,37 @@ function () {
 
   }, {
     key: "startSearch",
-    value: function startSearch() {
-      var val;
-      return regenerator.async(function startSearch$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return regenerator.awrap(timeout(500));
+    value: function () {
+      var _startSearch = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
+        var val;
+        return regenerator.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return timeout(500);
 
-            case 2:
-              val = this.input_el.value;
+              case 2:
+                val = this.input_el.value;
 
-              if (this._onHandleSearch) {
-                this._onHandleSearch(val);
-              }
+                if (this._onHandleSearch) {
+                  this._onHandleSearch(val);
+                }
 
-            case 4:
-            case "end":
-              return _context.stop();
+              case 4:
+              case "end":
+                return _context.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee, this);
+      }));
+
+      function startSearch() {
+        return _startSearch.apply(this, arguments);
+      }
+
+      return startSearch;
+    }()
   }, {
     key: "onSearch",
     value: function onSearch(call) {
@@ -5630,9 +5679,7 @@ function UUID () {
  * 树
  */
 
-var TreeRender =
-/*#__PURE__*/
-function () {
+var TreeRender = /*#__PURE__*/function () {
   function TreeRender(option, data, parent) {
     classCallCheck(this, TreeRender);
 
@@ -5686,69 +5733,77 @@ function () {
 
   }, {
     key: "formatData",
-    value: function formatData(data, option) {
-      var _this = this;
+    value: function () {
+      var _formatData = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(data, option) {
+        var _this = this;
 
-      var _data, level, level_title;
+        var _data, level, level_title;
 
-      return regenerator.async(function formatData$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _data = cloneDeep_1(data);
+        return regenerator.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _data = cloneDeep_1(data);
 
-              if (ObjectIs(data, 'object')) {
-                _data = cloneDeep_1(Object.keys(data).map(function (k) {
-                  return data[k];
-                }));
-              } // 按提供的层级分
-
-
-              level = option.level; // 按提供的层级显示名称
-
-              level_title = option.level_title; // 验证
-
-              if (!ObjectIs(option.level, 'array')) {
-                level = [];
-              } // 验证
+                if (ObjectIs(data, 'object')) {
+                  _data = cloneDeep_1(Object.keys(data).map(function (k) {
+                    return data[k];
+                  }));
+                } // 按提供的层级分
 
 
-              if (!ObjectIs(option.level_title, 'array')) {
-                level_title = [];
-              } // 生成指定数据
+                level = option.level; // 按提供的层级显示名称
+
+                level_title = option.level_title; // 验证
+
+                if (!ObjectIs(option.level, 'array')) {
+                  level = [];
+                } // 验证
 
 
-              _data.forEach(function (_item) {
-                level.forEach(function (key, index) {
-                  var val = _item[key];
+                if (!ObjectIs(option.level_title, 'array')) {
+                  level_title = [];
+                } // 生成指定数据
 
-                  if (ObjectIs(val, 'string') || ObjectIs(val, 'number')) {
-                    var pid = _this.getKey(index, level, _item);
 
-                    var id = _this.getKey(index + 1, level, _item);
+                _data.forEach(function (_item) {
+                  level.forEach(function (key, index) {
+                    var val = _item[key];
 
-                    var title_key = level_title[index];
-                    _this._data[id] = Object.assign({}, _item, {
-                      _tree_node_id: id,
-                      _tree_node_pid: pid,
-                      _tree_node_title: _item[title_key] || title_key,
-                      _tree_node_level: index + 1
-                    });
-                  } else {
-                    console.warn('此参数不是字符串，无法以此参数为一层', key, val);
-                  }
+                    if (ObjectIs(val, 'string') || ObjectIs(val, 'number')) {
+                      var pid = _this.getKey(index, level, _item);
+
+                      var id = _this.getKey(index + 1, level, _item);
+
+                      var title_key = level_title[index];
+                      _this._data[id] = Object.assign({}, _item, {
+                        _tree_node_id: id,
+                        _tree_node_pid: pid,
+                        _tree_node_title: _item[title_key] || title_key,
+                        _tree_node_level: index + 1
+                      });
+                    } else {
+                      console.warn('此参数不是字符串，无法以此参数为一层', key, val);
+                    }
+                  });
                 });
-              });
 
-              return _context.abrupt("return", this._data);
+                return _context.abrupt("return", this._data);
 
-            case 8:
-            case "end":
-              return _context.stop();
+              case 8:
+              case "end":
+                return _context.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee, this);
+      }));
+
+      function formatData(_x, _x2) {
+        return _formatData.apply(this, arguments);
+      }
+
+      return formatData;
+    }()
     /**
      * 生成树形数据
      * @param _data
@@ -5757,27 +5812,35 @@ function () {
 
   }, {
     key: "formatDataToTree",
-    value: function formatDataToTree(_data) {
-      return regenerator.async(function formatDataToTree$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              return _context2.abrupt("return", filter_1(_data, function (item) {
-                var arr = filter_1(_data, function (child) {
-                  return child._tree_node_pid === item._tree_node_id;
-                });
+    value: function () {
+      var _formatDataToTree = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(_data) {
+        return regenerator.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                return _context2.abrupt("return", filter_1(_data, function (item) {
+                  var arr = filter_1(_data, function (child) {
+                    return child._tree_node_pid === item._tree_node_id;
+                  });
 
-                arr.length && (item._tree_node_children = arr);
-                return !item.pid;
-              }));
+                  arr.length && (item._tree_node_children = arr);
+                  return !item.pid;
+                }));
 
-            case 1:
-            case "end":
-              return _context2.stop();
+              case 1:
+              case "end":
+                return _context2.stop();
+            }
           }
-        }
-      });
-    }
+        }, _callee2);
+      }));
+
+      function formatDataToTree(_x3) {
+        return _formatDataToTree.apply(this, arguments);
+      }
+
+      return formatDataToTree;
+    }()
     /**
      * 更新结构树，包括初始化
      * @param data
@@ -5787,42 +5850,50 @@ function () {
 
   }, {
     key: "updateTree",
-    value: function updateTree(data, option, isFind) {
-      var _option, _data;
+    value: function () {
+      var _updateTree = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(data, option, isFind) {
+        var _option, _data;
 
-      return regenerator.async(function updateTree$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              if (!isFind) {
-                this.original = data;
-              }
+        return regenerator.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!isFind) {
+                  this.original = data;
+                }
 
-              _option = !option ? this.option : Setting.updateTreeOption(option);
-              this.reset();
-              this.option = _option; // 生成平级数据
+                _option = !option ? this.option : Setting.updateTreeOption(option);
+                this.reset();
+                this.option = _option; // 生成平级数据
 
-              _context3.next = 6;
-              return regenerator.awrap(this.formatData(data, this.option));
+                _context3.next = 6;
+                return this.formatData(data, this.option);
 
-            case 6:
-              _data = _context3.sent;
-              _context3.next = 9;
-              return regenerator.awrap(this.formatDataToTree(_data));
+              case 6:
+                _data = _context3.sent;
+                _context3.next = 9;
+                return this.formatDataToTree(_data);
 
-            case 9:
-              this._tree_data = _context3.sent;
-              // 初始默认渲染第一级
-              this.updateView(this._tree_data);
-              return _context3.abrupt("return", this);
+              case 9:
+                this._tree_data = _context3.sent;
+                // 初始默认渲染第一级
+                this.updateView(this._tree_data);
+                return _context3.abrupt("return", this);
 
-            case 12:
-            case "end":
-              return _context3.stop();
+              case 12:
+              case "end":
+                return _context3.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee3, this);
+      }));
+
+      function updateTree(_x4, _x5, _x6) {
+        return _updateTree.apply(this, arguments);
+      }
+
+      return updateTree;
+    }()
     /**
      * 更新Dom
      * @param data
@@ -5894,71 +5965,79 @@ function () {
 
   }, {
     key: "check",
-    value: function check(item, e, bool, needEmit) {
-      var _this3 = this;
+    value: function () {
+      var _check = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4(item, e, bool, needEmit) {
+        var _this3 = this;
 
-      var checkedIds, childData, id, toChecked;
-      return regenerator.async(function check$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              if (e) {
-                e.stopPropagation();
-              }
+        var checkedIds, childData, id, toChecked;
+        return regenerator.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (e) {
+                  e.stopPropagation();
+                }
 
-              checkedIds = [];
-              _context4.next = 4;
-              return regenerator.awrap(this.getChildData(item));
+                checkedIds = [];
+                _context4.next = 4;
+                return this.getChildData(item);
 
-            case 4:
-              childData = _context4.sent;
-              id = item._tree_node_id;
-              toChecked = !this.isChecked(item);
+              case 4:
+                childData = _context4.sent;
+                id = item._tree_node_id;
+                toChecked = !this.isChecked(item);
 
-              if (ObjectIs(bool, 'boolean')) {
-                toChecked = bool;
-              }
+                if (ObjectIs(bool, 'boolean')) {
+                  toChecked = bool;
+                }
 
-              if (!ObjectIs(needEmit, 'boolean')) {
-                needEmit = true;
-              } // 切换当前项选择
-
-
-              item._tree_node_checked = toChecked;
-              item._tree_node_check_half = false;
-              onHandleChecked(id, toChecked, false); // 子集全部勾选
-
-              if (childData && childData.length) {
-                childData.forEach(function (childId) {
-                  var item = _this3._data[childId];
-                  item._tree_node_checked = toChecked;
-                  item._tree_node_check_half = false;
-                  onHandleChecked(childId, toChecked, false);
-
-                  if (!(item._tree_node_children && item._tree_node_children.length)) {
-                    checkedIds.push(item);
-                  }
-                });
-              } else {
-                checkedIds.push(item);
-              } // 父级判断是否选择
+                if (!ObjectIs(needEmit, 'boolean')) {
+                  needEmit = true;
+                } // 切换当前项选择
 
 
-              this.checkParent(item, toChecked, function (pid, checked, half) {
-                onHandleChecked(pid, checked, half);
-              }); // 回调选择
+                item._tree_node_checked = toChecked;
+                item._tree_node_check_half = false;
+                onHandleChecked(id, toChecked, false); // 子集全部勾选
 
-              if (needEmit) {
-                this.onChecked(checkedIds, toChecked);
-              }
+                if (childData && childData.length) {
+                  childData.forEach(function (childId) {
+                    var item = _this3._data[childId];
+                    item._tree_node_checked = toChecked;
+                    item._tree_node_check_half = false;
+                    onHandleChecked(childId, toChecked, false);
 
-            case 15:
-            case "end":
-              return _context4.stop();
+                    if (!(item._tree_node_children && item._tree_node_children.length)) {
+                      checkedIds.push(item);
+                    }
+                  });
+                } else {
+                  checkedIds.push(item);
+                } // 父级判断是否选择
+
+
+                this.checkParent(item, toChecked, function (pid, checked, half) {
+                  onHandleChecked(pid, checked, half);
+                }); // 回调选择
+
+                if (needEmit) {
+                  this.onChecked(checkedIds, toChecked);
+                }
+
+              case 15:
+              case "end":
+                return _context4.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee4, this);
+      }));
+
+      function check(_x7, _x8, _x9, _x10) {
+        return _check.apply(this, arguments);
+      }
+
+      return check;
+    }()
     /**
      * 判断是否选中
      * @param item
@@ -6049,51 +6128,59 @@ function () {
 
   }, {
     key: "getParentData",
-    value: function getParentData(item) {
-      var _this5 = this;
+    value: function () {
+      var _getParentData = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee5(item) {
+        var _this5 = this;
 
-      var id, arr, recursive;
-      return regenerator.async(function getParentData$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              id = item._tree_node_id;
+        var id, arr, recursive;
+        return regenerator.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                id = item._tree_node_id;
 
-              if (!this.parentData[id]) {
-                _context5.next = 3;
-                break;
-              }
-
-              return _context5.abrupt("return", this.parentData[id]);
-
-            case 3:
-              arr = [];
-
-              recursive = function recursive(_item) {
-                var pid = _item._tree_node_pid;
-
-                if (!pid) {
-                  return;
+                if (!this.parentData[id]) {
+                  _context5.next = 3;
+                  break;
                 }
 
-                arr.push(pid);
-                recursive(_this5._data[pid]);
-              };
+                return _context5.abrupt("return", this.parentData[id]);
 
-              _context5.next = 7;
-              return regenerator.awrap(recursive(item));
+              case 3:
+                arr = [];
 
-            case 7:
-              this.parentData[id] = arr;
-              return _context5.abrupt("return", arr);
+                recursive = function recursive(_item) {
+                  var pid = _item._tree_node_pid;
 
-            case 9:
-            case "end":
-              return _context5.stop();
+                  if (!pid) {
+                    return;
+                  }
+
+                  arr.push(pid);
+                  recursive(_this5._data[pid]);
+                };
+
+                _context5.next = 7;
+                return recursive(item);
+
+              case 7:
+                this.parentData[id] = arr;
+                return _context5.abrupt("return", arr);
+
+              case 9:
+              case "end":
+                return _context5.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee5, this);
+      }));
+
+      function getParentData(_x11) {
+        return _getParentData.apply(this, arguments);
+      }
+
+      return getParentData;
+    }()
     /**
      * 通过子集ID，获取所有父级ID
      * @param id
@@ -6102,48 +6189,56 @@ function () {
 
   }, {
     key: "getChildData",
-    value: function getChildData(item) {
-      var id, arr, recursive;
-      return regenerator.async(function getChildData$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              recursive = function _ref(_item) {
-                var children = _item._tree_node_children;
+    value: function () {
+      var _getChildData = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee6(item) {
+        var id, arr, recursive;
+        return regenerator.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                recursive = function _recursive(_item) {
+                  var children = _item._tree_node_children;
 
-                if (children && children.length) {
-                  children.forEach(function (child) {
-                    arr.push(child._tree_node_id);
-                    recursive(child);
-                  });
+                  if (children && children.length) {
+                    children.forEach(function (child) {
+                      arr.push(child._tree_node_id);
+                      recursive(child);
+                    });
+                  }
+                };
+
+                id = item._tree_node_id;
+
+                if (!this.childData[id]) {
+                  _context6.next = 4;
+                  break;
                 }
-              };
 
-              id = item._tree_node_id;
+                return _context6.abrupt("return", this.childData[id]);
 
-              if (!this.childData[id]) {
-                _context6.next = 4;
-                break;
-              }
+              case 4:
+                arr = [];
+                _context6.next = 7;
+                return recursive(item);
 
-              return _context6.abrupt("return", this.childData[id]);
+              case 7:
+                this.childData[id] = arr;
+                return _context6.abrupt("return", arr);
 
-            case 4:
-              arr = [];
-              _context6.next = 7;
-              return regenerator.awrap(recursive(item));
-
-            case 7:
-              this.childData[id] = arr;
-              return _context6.abrupt("return", arr);
-
-            case 9:
-            case "end":
-              return _context6.stop();
+              case 9:
+              case "end":
+                return _context6.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee6, this);
+      }));
+
+      function getChildData(_x12) {
+        return _getChildData.apply(this, arguments);
+      }
+
+      return getChildData;
+    }()
     /**
      * 第一层子集是否都是选中的
      * @param id
@@ -6230,6 +6325,43 @@ function () {
       return result;
     }
     /**
+     * 筛选指定条件
+     * @param {Object|null} _option 
+     * @param {Function} callback 
+     */
+
+  }, {
+    key: "filter",
+    value: function filter(_option, callback) {
+      var result = [];
+
+      if (!_option) {
+        _option = {};
+      }
+
+      var data = _option.data || this.original;
+
+      if (ObjectIs(data, 'array')) {
+        for (var i = 0; i < data.length; i++) {
+          var res = callback && callback(data[i]);
+
+          if (res) {
+            result.push(data[i]);
+          }
+        }
+      } else if (ObjectIs(data, 'object')) {
+        for (var _i2 in data) {
+          var _res = callback && callback(data[_i2]);
+
+          if (_res) {
+            result.push(data[_i2]);
+          }
+        }
+      }
+
+      return result;
+    }
+    /**
      * 搜索并更改UI
      * @param val
      * @param option
@@ -6294,20 +6426,26 @@ function () {
           }));
         }
       });
-      arr.forEach(function _callee(item) {
-        return regenerator.async(function _callee$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _this6.check(item, null, bool, needEmit);
+      arr.forEach( /*#__PURE__*/function () {
+        var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee7(item) {
+          return regenerator.wrap(function _callee7$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  _this6.check(item, null, bool, needEmit);
 
-              case 1:
-              case "end":
-                return _context7.stop();
+                case 1:
+                case "end":
+                  return _context7.stop();
+              }
             }
-          }
-        });
-      });
+          }, _callee7);
+        }));
+
+        return function (_x13) {
+          return _ref.apply(this, arguments);
+        };
+      }());
     }
     /**
      * 获取当前已经被选中的
@@ -6378,9 +6516,7 @@ function () {
  * 生成树
  */
 
-var Install =
-/*#__PURE__*/
-function () {
+var Install = /*#__PURE__*/function () {
   function Install(elOrIdOrClassname, settingOrData) {
     classCallCheck(this, Install);
 
@@ -6401,49 +6537,57 @@ function () {
      * 开始渲染
      * @returns {Promise<void>}
      */
-    value: function render() {
-      var _this = this;
+    value: function () {
+      var _render = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
+        var _this = this;
 
-      return regenerator.async(function render$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              if (!this.root) {
-                _context.next = 2;
-                break;
-              }
+        return regenerator.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!this.root) {
+                  _context.next = 2;
+                  break;
+                }
 
-              return _context.abrupt("return");
+                return _context.abrupt("return");
 
-            case 2:
-              _context.next = 4;
-              return regenerator.awrap(new ParentRender(this.setting.parent, this.el));
+              case 2:
+                _context.next = 4;
+                return new ParentRender(this.setting.parent, this.el);
 
-            case 4:
-              this.root = _context.sent;
-              _context.next = 7;
-              return regenerator.awrap(new SearchRender(this.setting.search, this.root));
+              case 4:
+                this.root = _context.sent;
+                _context.next = 7;
+                return new SearchRender(this.setting.search, this.root);
 
-            case 7:
-              this.search = _context.sent;
-              _context.next = 10;
-              return regenerator.awrap(new TreeRender(this.setting.tree, this.setting.data, this.root));
+              case 7:
+                this.search = _context.sent;
+                _context.next = 10;
+                return new TreeRender(this.setting.tree, this.setting.data, this.root);
 
-            case 10:
-              this.tree = _context.sent;
-              // 监听搜索
-              this.search.onSearch(function (val) {
-                _this.searchUpdateUI(val);
-              });
-              return _context.abrupt("return", this);
+              case 10:
+                this.tree = _context.sent;
+                // 监听搜索
+                this.search.onSearch(function (val) {
+                  _this.searchUpdateUI(val);
+                });
+                return _context.abrupt("return", this);
 
-            case 13:
-            case "end":
-              return _context.stop();
+              case 13:
+              case "end":
+                return _context.stop();
+            }
           }
-        }
-      }, null, this);
-    }
+        }, _callee, this);
+      }));
+
+      function render() {
+        return _render.apply(this, arguments);
+      }
+
+      return render;
+    }()
     /**
      * 更新结构树数据
      */
